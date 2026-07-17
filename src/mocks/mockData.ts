@@ -1,6 +1,5 @@
 import type { User } from "../types/user";
 
-
 const STORAGE_KEY = "mock_users";
 
 const initialUsers: User[] = [
@@ -25,13 +24,27 @@ const initialUsers: User[] = [
     role: "Admin",
     status: "Inactive",
   },
+  {
+    id: 4,
+    name: "Sneha Reddy",
+    email: "sneha@example.com",
+    role: "Developer",
+    status: "Active",
+  },
+  {
+    id: 5,
+    name: "Karthik Raj",
+    email: "karthik@example.com",
+    role: "Tester",
+    status: "Inactive",
+  },
 ];
 
-const getStoredUsers = (): User[] => {
+export const getMockUsers = (): User[] => {
   const storedUsers = localStorage.getItem(STORAGE_KEY);
 
   if (storedUsers) {
-    return JSON.parse(storedUsers);
+    return JSON.parse(storedUsers) as User[];
   }
 
   localStorage.setItem(
@@ -42,13 +55,9 @@ const getStoredUsers = (): User[] => {
   return initialUsers;
 };
 
-export let users: User[] = getStoredUsers();
-
-export const setUsers = (newUsers: User[]) => {
-  users = newUsers;
-
+export const setMockUsers = (users: User[]): void => {
   localStorage.setItem(
     STORAGE_KEY,
-    JSON.stringify(newUsers)
+    JSON.stringify(users)
   );
 };
