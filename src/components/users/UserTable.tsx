@@ -1,3 +1,5 @@
+import { Pencil, Trash2 } from "lucide-react";
+
 const users = [
   {
     id: 1,
@@ -21,25 +23,11 @@ const UserTable = () => {
       <table className="w-full">
         <thead className="bg-slate-900 text-left text-white">
           <tr>
-            <th className="p-4">
-              Name
-            </th>
-
-            <th className="p-4">
-              Email
-            </th>
-
-            <th className="p-4">
-              Role
-            </th>
-
-            <th className="p-4">
-              Status
-            </th>
-
-            <th className="p-4">
-              Actions
-            </th>
+            <th className="p-4">Name</th>
+            <th className="p-4">Email</th>
+            <th className="p-4">Role</th>
+            <th className="p-4">Status</th>
+            <th className="p-4">Actions</th>
           </tr>
         </thead>
 
@@ -66,24 +54,39 @@ const UserTable = () => {
               </td>
 
               <td className="p-4">
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    className="rounded bg-yellow-500 px-3 py-1"
+                    title="Edit user"
+                    aria-label="Edit user"
+                    className="rounded p-2 text-blue-600 transition hover:bg-blue-50"
                   >
-                    Edit
+                    <Pencil size={18} />
                   </button>
 
                   <button
                     type="button"
-                    className="rounded bg-red-500 px-3 py-1 text-white"
+                    title="Delete user"
+                    aria-label="Delete user"
+                    className="rounded p-2 text-red-600 transition hover:bg-red-50"
                   >
-                    Delete
+                    <Trash2 size={18} />
                   </button>
                 </div>
               </td>
             </tr>
           ))}
+
+          {users.length === 0 && (
+            <tr>
+              <td
+                colSpan={5}
+                className="p-8 text-center text-gray-500"
+              >
+                No users found.
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>
