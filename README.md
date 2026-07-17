@@ -1,392 +1,506 @@
-# React State Management Practice
+# Zustand Notes
 
-A basic React application created to practice and compare different state-management approaches using the same Authentication and User CRUD functionality.
+Zustand is a lightweight state management library for React. It allows multiple components to access and update shared state without prop drilling or wrapping the application with multiple Context providers.
 
-## Tech Stack
-
-* React.js
-* TypeScript
-* Vite
-* pnpm
-* Tailwind CSS
-* Bootstrap
-* React Router DOM
-* React Toastify
-* MSW (Mock Service Worker)
-* LocalStorage for mock data persistence
-
-The same base application can later be implemented using:
-
-* Context API
-* Redux Toolkit
-* Redux Toolkit + RTK Query
-* Zustand
-* TanStack Query
-* Zustand + TanStack Query
-
----
-
-## 1. Create Vite Project
+## Installation
 
 ```bash
-pnpm create vite@latest state-management-practice --template react-ts
-```
-
-Move into the project:
-
-```bash
-cd state-management-practice
-```
-
-Install the default dependencies:
-
-```bash
-pnpm install
+pnpm add zustand
 ```
 
 ---
 
-## 2. Install React Router DOM
+## 1. Basic Zustand Store
 
-```bash
-pnpm add react-router-dom
-```
+A Zustand store contains:
 
----
-
-## 3. Install Tailwind CSS
-
-```bash
-pnpm add -D tailwindcss @tailwindcss/vite
-```
-
-Configure Tailwind CSS in `vite.config.ts`:
+- **State** – the data
+- **Actions** – functions that update the data
 
 ```ts
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
+import { create } from "zustand";
 
-export default defineConfig({
-  plugins: [react(), tailwindcss()],
+interface CounterState {
+  count: number;
+  increment: () => void;
+}
+
+export const useCounterStore = create<CounterState>((set) => ({
+  count: 0,
+
+  increment: () =>
+    set((state) => ({
+      count: state.count + 1,
+    })),
+}));
+```
+
+Basic flow:
+
+```text
+Component
+    ↓
+Calls Action
+    ↓
+Zustand Store
+    ↓
+set() updates state
+    ↓
+Component re-renders
+```
+
+---
+
+## 2. `create()`, `set()` and `get()`
+
+### `create()`
+
+Creates the Zustand store.
+
+```ts
+create((set, get) => ({
+  // state
+  // actions
+}));
+```
+
+### `set()`
+
+Updates the store state.
+
+```ts
+set({
+  loading: true,
 });
 ```
 
-Add Tailwind CSS to `src/index.css`:
+When the new value depends on the current state:
 
-```css
-@import "tailwindcss";
+```ts
+set((state) => ({
+  count: state.count + 1,
+}));
+```
+
+### `get()`
+
+Reads the latest state inside the store.
+
+```ts
+const count = get().count;
+```
+
+Remember:
+
+```text
+create() → Create store
+set()    → Update state
+get()    → Read current state
 ```
 
 ---
 
-## 4. Install Bootstrap
+## 3. Using Store State in Components
 
-```bash
-pnpm add bootstrap
-```
-
-Import Bootstrap in `src/main.tsx`:
-
-```ts
-import "bootstrap/dist/css/bootstrap.min.css";
-```
-
----
-
-## 5. Install React Toastify
-
-```bash
-pnpm add react-toastify
-```
-
-Import the React Toastify CSS:
-
-```ts
-import "react-toastify/dist/ReactToastify.css";
-```
-
-Add `ToastContainer` to the application:
+Use a selector to access only the required state.
 
 ```tsx
-import { ToastContainer } from "react-toastify";
-
-<ToastContainer
-  position="bottom-center"
-  autoClose={2500}
-  hideProgressBar={false}
-  newestOnTop
-  closeOnClick
-  pauseOnHover
-  draggable
-  theme="light"
-/>
+const count = useCounterStore(
+  (state) => state.count
+);
 ```
+
+Access an action:
+
+```tsx
+const increment = useCounterStore(
+  (state) => state.increment
+);
+```
+
+Use it:
+
+```tsx
+<button onClick={increment}>
+  Increment
+</button>
+```
+
+Components subscribed to changed state automatically re-render.
 
 ---
 
-## 6. Install MSW
+## 4. Authentication with Zustand
 
-Install Mock Service Worker:
-
-```bash
-pnpm add -D msw
-```
-
-Generate the MSW service worker file:
-
-```bash
-pnpm exec msw init public/ --save
-```
-
-This creates:
+Authentication state can be managed in a separate store.
 
 ```text
-public/
-└── mockServiceWorker.js
+Auth Store
+├── user
+├── token
+├── isAuthenticated
+├── loading
+├── error
+├── login()
+└── logout()
 ```
 
----
-
-## 7. Configure MSW
-
-Create the following mock files:
-
-```text
-src/
-└── mocks/
-    ├── browser.ts
-    ├── handlers.ts
-    └── mockData.ts
-```
-
-Initialize MSW in `src/main.tsx`:
-
-```ts
-const enableMSW =
-  import.meta.env.DEV ||
-  import.meta.env.VITE_ENABLE_MSW === "true";
-
-if (enableMSW) {
-  const { worker } = await import("./mocks/browser");
-
-  await worker.start({
-    onUnhandledRequest: "bypass",
-  });
-}
-```
-
----
-
-## 8. Configure Path Alias
-
-The project uses the `@/` alias for imports.
-
-Example:
-
-```ts
-import { UserProvider } from "@/context/UserContext";
-```
-
-Update `vite.config.ts`:
-
-```ts
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
-import path from "path";
-
-export default defineConfig({
-  plugins: [react(), tailwindcss()],
-
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
-  },
-});
-```
-
-Install Node.js type definitions if required:
-
-```bash
-pnpm add -D @types/node
-```
-
-Update the TypeScript configuration:
-
-```json
-{
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  }
-}
-```
-
----
-
-## 9. Environment Configuration
-
-Create a `.env` file if you want to manually control MSW:
-
-```env
-VITE_ENABLE_MSW=true
-```
-
-MSW will automatically run in development mode because of:
-
-```ts
-import.meta.env.DEV
-```
-
-The environment variable allows MSW to be enabled manually in other environments when needed.
-
----
-
-## 10. Mock Data Persistence
-
-MSW mock data normally resets whenever the browser is refreshed because the data exists only in memory.
-
-To persist Create, Update, and Delete operations, this project stores mock users in `localStorage`.
-
-The flow is:
-
-```text
-Initial Mock Data
-       ↓
-localStorage
-       ↓
-MSW API
-       ↓
-React Application
-       ↓
-Create / Update / Delete
-       ↓
-MSW Handler
-       ↓
-Update localStorage
-       ↓
-Browser Refresh
-       ↓
-Updated Data Remains
-```
-
-To reset the mock data, remove the stored data from browser localStorage.
-
-Example:
-
-```js
-localStorage.removeItem("mock_users");
-```
-
-Then refresh the application.
-
----
-
-## 11. Authentication
-
-The application contains a basic mock authentication flow.
-
-Login credentials:
-
-```text
-Email: admin@example.com
-Password: admin123
-```
-
-Authentication flow:
+Login flow:
 
 ```text
 Login Page
     ↓
-POST /api/auth/login
+login(credentials)
     ↓
-MSW Handler
+Auth Store
     ↓
-Validate Credentials
+Auth Service
     ↓
-Return Mock Token
+API / MSW
     ↓
-Store Token
+Store user and token
     ↓
+Update authentication state
+```
+
+This removes authentication state management from individual components.
+
+---
+
+## 5. Protected Routes with Zustand
+
+Protected routes can read authentication state directly from the store.
+
+```tsx
+const isAuthenticated = useAuthStore(
+  (state) => state.isAuthenticated
+);
+```
+
+Flow:
+
+```text
 Protected Route
-    ↓
-Dashboard
+      ↓
+isAuthenticated?
+   ↙        ↘
+ true      false
+  ↓          ↓
+Outlet    Login Page
 ```
 
 ---
 
-## 12. Mock API Endpoints
+## 6. CRUD with Zustand
 
-Authentication:
+A user store can manage CRUD-related state and actions.
 
 ```text
-POST /api/auth/login
+User Store
+├── users
+├── selectedUser
+├── loading
+├── error
+├── fetchUsers()
+├── addUser()
+├── updateUser()
+└── deleteUser()
 ```
 
-User CRUD:
+Architecture:
 
 ```text
-GET    /api/users
-GET    /api/users/:id
-POST   /api/users
-PUT    /api/users/:id
-DELETE /api/users/:id
+Component
+    ↓
+Zustand Store
+    ↓
+Service
+    ↓
+API / MSW
+```
+
+The component mainly handles the UI, while the store manages state and actions.
+
+---
+
+## 7. Async API Calls
+
+Zustand actions can be asynchronous.
+
+```ts
+fetchUsers: async () => {
+  const users = await getUsers();
+
+  set({
+    users,
+  });
+};
+```
+
+Flow:
+
+```text
+Component
+    ↓
+fetchUsers()
+    ↓
+Zustand Action
+    ↓
+Service
+    ↓
+API / MSW
+    ↓
+Response
+    ↓
+set({ users })
+    ↓
+UI updates
+```
+
+Zustand manages the state. The service layer handles the actual API request.
+
+---
+
+## 8. Loading and Error Handling
+
+For asynchronous operations, the common pattern is:
+
+```ts
+set({
+  loading: true,
+  error: null,
+});
+
+try {
+  // API call
+  // Update successful data
+} catch (error) {
+  // Update error state
+} finally {
+  set({
+    loading: false,
+  });
+}
+```
+
+Flow:
+
+```text
+API starts
+    ↓
+loading = true
+    ↓
+Success / Error
+    ↓
+Update state
+    ↓
+loading = false
 ```
 
 ---
 
-## 13. Run the Application
+## 9. Persist Middleware
 
-Start the development server:
+Zustand state normally resets after a browser refresh.
 
-```bash
-pnpm dev
+The `persist` middleware can save selected state to storage.
+
+```ts
+import { persist } from "zustand/middleware";
+
+create(
+  persist(
+    (set) => ({
+      // state
+      // actions
+    }),
+    {
+      name: "auth-storage",
+    }
+  )
+);
 ```
 
-Build the application:
+Useful data to persist:
 
-```bash
-pnpm build
+```text
+✓ Authentication
+✓ User preferences
+✓ Theme
+✓ Cart
 ```
 
-Preview the production build:
+Usually avoid persisting temporary state:
 
-```bash
-pnpm preview
-```
-
-Run ESLint:
-
-```bash
-pnpm lint
+```text
+✗ Loading
+✗ Errors
+✗ Modal state
 ```
 
 ---
 
-## Project Purpose
+## 10. Selectors and Performance
 
-The purpose of this project is to use the same UI, Authentication, CRUD operations, API endpoints, and MSW mock backend while changing only the state-management implementation.
+Avoid selecting the entire store when only one value is needed.
 
-Recommended learning order:
+Instead of:
+
+```tsx
+const store = useUserStore();
+```
+
+Prefer:
+
+```tsx
+const users = useUserStore(
+  (state) => state.users
+);
+```
+
+This helps components subscribe only to the state they need.
+
+For selecting multiple values, Zustand also provides `useShallow`.
+
+---
+
+## 11. Immer with Zustand
+
+Immer is useful for updating complex or deeply nested state.
+
+Without Immer:
+
+```ts
+set((state) => ({
+  user: {
+    ...state.user,
+    profile: {
+      ...state.user.profile,
+      name: "Muthu",
+    },
+  },
+}));
+```
+
+With Immer:
+
+```ts
+set((state) => {
+  state.user.profile.name = "Muthu";
+});
+```
+
+Immer allows mutation-style code while internally keeping state updates immutable.
+
+### When to use Immer
+
+Use it for complex nested state:
 
 ```text
-Base Setup
-    ↓
-Context API
-    ↓
-Redux Toolkit
-    ↓
-Redux Toolkit + RTK Query
-    ↓
+Company
+└── Departments
+    └── Teams
+        └── Employees
+```
+
+For simple updates, Immer is usually unnecessary:
+
+```ts
+set({
+  loading: true,
+});
+```
+
+Learn normal Zustand first, then use Immer when state updates become complex.
+
+---
+
+## Zustand vs TanStack Query
+
+Zustand is mainly used for **client/global state**.
+
+```text
+Authentication
+UI state
+Theme
+User preferences
+Cart
+```
+
+TanStack Query is mainly designed for **server/API state**.
+
+```text
+API data
+Caching
+Refetching
+Synchronization
+Server data updates
+```
+
+For learning, CRUD can first be implemented completely with Zustand.
+
+A common real-world combination is:
+
+```text
 Zustand
     ↓
+Client / Global State
+
 TanStack Query
     ↓
+Server / API State
+```
+
+Similarly:
+
+```text
+Redux Toolkit + RTK Query
+```
+
+can be compared with:
+
+```text
 Zustand + TanStack Query
 ```
 
-This makes it easier to understand the differences between client state management and server state management without rebuilding the entire application for every library.
+---
+
+## Quick Reference
+
+| Concept | Purpose |
+|---|---|
+| `create()` | Creates the Zustand store |
+| `set()` | Updates state |
+| `get()` | Reads current state inside the store |
+| Selector | Reads only required state |
+| Action | Function that changes state |
+| Async Action | Handles asynchronous operations |
+| `persist` | Saves state across browser refresh |
+| `useShallow` | Helps optimize multiple selections |
+| Immer | Simplifies complex nested state updates |
+
+## Learning Order
+
+```text
+1. Basic Zustand Store
+        ↓
+2. create(), set(), get()
+        ↓
+3. State and Actions in Components
+        ↓
+4. Authentication
+        ↓
+5. Protected Routes
+        ↓
+6. User CRUD
+        ↓
+7. Async API Calls
+        ↓
+8. Loading and Error Handling
+        ↓
+9. Persist Middleware
+        ↓
+10. Selectors and Performance
+        ↓
+11. Immer
+```
