@@ -3,13 +3,12 @@ import {
   Route,
   Routes,
 } from "react-router-dom";
-
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import UsersPage from "./pages/UsersPage";
-
 import ProtectedRoute from "./routes/ProtectedRoute";
 import AppLayout from "./layouts/AppLayout";
+import ProductsPage from "./pages/ProductsPage";
 
 const App = () => {
   return (
@@ -25,10 +24,13 @@ const App = () => {
             path="/dashboard"
             element={<DashboardPage />}
           />
-
           <Route
             path="/users"
             element={<UsersPage />}
+          />
+          <Route
+            path="/products"
+            element={<ProductsPage />}
           />
         </Route>
       </Route>

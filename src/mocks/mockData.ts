@@ -1,6 +1,8 @@
+import type { Product } from "../types/product";
 import type { User } from "../types/user";
 
-const STORAGE_KEY = "mock_users";
+const USER_STORAGE_KEY = "mock_users";
+const PRODUCT_STORAGE_KEY = "mock_products";
 
 const initialUsers: User[] = [
   {
@@ -17,47 +19,75 @@ const initialUsers: User[] = [
     role: "Tester",
     status: "Active",
   },
+];
+
+const initialProducts: Product[] = [
   {
-    id: 3,
-    name: "Rahul Verma",
-    email: "rahul@example.com",
-    role: "Admin",
-    status: "Inactive",
+    id: 1,
+    name: "Laptop",
+    category: "Electronics",
+    price: 55000,
+    stock: 10,
+    status: "Available",
   },
   {
-    id: 4,
-    name: "Sneha Reddy",
-    email: "sneha@example.com",
-    role: "Developer",
-    status: "Active",
-  },
-  {
-    id: 5,
-    name: "Karthik Raj",
-    email: "karthik@example.com",
-    role: "Tester",
-    status: "Inactive",
+    id: 2,
+    name: "Office Chair",
+    category: "Furniture",
+    price: 8000,
+    stock: 5,
+    status: "Available",
   },
 ];
 
 export const getMockUsers = (): User[] => {
-  const storedUsers = localStorage.getItem(STORAGE_KEY);
+  const storedUsers =
+    localStorage.getItem(USER_STORAGE_KEY);
 
   if (storedUsers) {
     return JSON.parse(storedUsers) as User[];
   }
 
   localStorage.setItem(
-    STORAGE_KEY,
+    USER_STORAGE_KEY,
     JSON.stringify(initialUsers)
   );
 
   return initialUsers;
 };
 
-export const setMockUsers = (users: User[]): void => {
+export const setMockUsers = (
+  users: User[]
+): void => {
   localStorage.setItem(
-    STORAGE_KEY,
+    USER_STORAGE_KEY,
     JSON.stringify(users)
+  );
+};
+
+export const getMockProducts = (): Product[] => {
+  const storedProducts =
+    localStorage.getItem(PRODUCT_STORAGE_KEY);
+
+  if (storedProducts) {
+    return JSON.parse(
+      storedProducts
+    ) as Product[];
+  }
+
+  localStorage.setItem(
+    PRODUCT_STORAGE_KEY,
+    JSON.stringify(initialProducts)
+  );
+
+  return initialProducts;
+};
+
+export const setMockProducts = (
+  products: Product[]
+): void => {
+  localStorage.setItem(
+    PRODUCT_STORAGE_KEY,
+    JSON.stringify(products)
   );
 };

@@ -33,6 +33,10 @@ const AppLayout = () => {
               Users
             </NavLink>
 
+            <NavLink to="/products">
+              Products
+            </NavLink>
+
             <button
               onClick={handleLogout}
               className="rounded bg-red-500 px-4 py-2"
