@@ -1,26 +1,45 @@
-import type { User } from "../../types/user";
+const users = [
+  {
+    id: 1,
+    name: "Arun Kumar",
+    email: "arun@example.com",
+    role: "Developer",
+    status: "Active",
+  },
+  {
+    id: 2,
+    name: "Priya Sharma",
+    email: "priya@example.com",
+    role: "Tester",
+    status: "Active",
+  },
+];
 
-interface UserTableProps {
-  users: User[];
-  onEdit: (user: User) => void;
-  onDelete: (id: number) => void;
-}
-
-const UserTable = ({
-  users,
-  onEdit,
-  onDelete,
-}: UserTableProps) => {
+const UserTable = () => {
   return (
-    <div className="overflow-hidden rounded-lg bg-white shadow">
+    <div className="overflow-x-auto rounded-lg bg-white shadow">
       <table className="w-full">
         <thead className="bg-slate-900 text-left text-white">
           <tr>
-            <th className="p-4">Name</th>
-            <th className="p-4">Email</th>
-            <th className="p-4">Role</th>
-            <th className="p-4">Status</th>
-            <th className="p-4">Actions</th>
+            <th className="p-4">
+              Name
+            </th>
+
+            <th className="p-4">
+              Email
+            </th>
+
+            <th className="p-4">
+              Role
+            </th>
+
+            <th className="p-4">
+              Status
+            </th>
+
+            <th className="p-4">
+              Actions
+            </th>
           </tr>
         </thead>
 
@@ -49,16 +68,14 @@ const UserTable = ({
               <td className="p-4">
                 <div className="flex gap-2">
                   <button
-                    onClick={() => onEdit(user)}
+                    type="button"
                     className="rounded bg-yellow-500 px-3 py-1"
                   >
                     Edit
                   </button>
 
                   <button
-                    onClick={() =>
-                      onDelete(user.id)
-                    }
+                    type="button"
                     className="rounded bg-red-500 px-3 py-1 text-white"
                   >
                     Delete
@@ -67,17 +84,6 @@ const UserTable = ({
               </td>
             </tr>
           ))}
-
-          {users.length === 0 && (
-            <tr>
-              <td
-                colSpan={5}
-                className="p-8 text-center text-gray-500"
-              >
-                No users found.
-              </td>
-            </tr>
-          )}
         </tbody>
       </table>
     </div>

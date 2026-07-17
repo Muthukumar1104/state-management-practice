@@ -1,162 +1,109 @@
-import {
-    useEffect,
-    useState,
-} from "react";
-import type {
-    User,
-    UserPayload,
-    UserRole,
-    UserStatus,
-} from "../../types/user";
-
-interface UserFormProps {
-    selectedUser: User | null;
-    onSubmit: (data: UserPayload) => Promise<void>;
-    onCancel: () => void;
-}
-
-const initialForm: UserPayload = {
-    name: "",
-    email: "",
-    role: "Developer",
-    status: "Active",
-};
-
-const UserForm = ({
-    selectedUser,
-    onSubmit,
-    onCancel,
-}: UserFormProps) => {
-    const [form, setForm] =
-        useState<UserPayload>(initialForm);
-
-    const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        if (selectedUser) {
-            setForm({
-                name: selectedUser.name,
-                email: selectedUser.email,
-                role: selectedUser.role,
-                status: selectedUser.status,
-            });
-        } else {
-            setForm(initialForm);
-        }
-    }, [selectedUser]);
-
-    const handleSubmit = async (
-        event: React.SyntheticEvent<HTMLFormElement>
-    ) => {
-        event.preventDefault();
-
-        try {
-            setLoading(true);
-
-            await onSubmit(form);
-
-            setForm(initialForm);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    let submitButtonText = "Create";
-
-    if (selectedUser) {
-        submitButtonText = "Update";
-    }
-
-    if (loading) {
-        submitButtonText = "Saving...";
-    }
-
+const UserForm = () => {
     return (
-        <form
-            onSubmit={handleSubmit}
-            className="rounded-lg bg-white p-6 shadow"
-        >
+        <form className="rounded-lg bg-white p-6 shadow">
             <h2 className="mb-5 text-xl font-semibold">
-                {selectedUser
-                    ? "Edit User"
-                    : "Add User"}
+                Add User
             </h2>
 
             <div className="space-y-4">
-                <input
-                    placeholder="Name"
-                    value={form.name}
-                    onChange={(event) =>
-                        setForm({
-                            ...form,
-                            name: event.target.value,
-                        })
-                    }
-                    required
-                    className="w-full rounded border p-3"
-                />
+                <div>
+                    <label
+                        htmlFor="name"
+                        className="mb-1 block text-sm font-medium"
+                    >
+                        Name
+                    </label>
 
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={form.email}
-                    onChange={(event) =>
-                        setForm({
-                            ...form,
-                            email: event.target.value,
-                        })
-                    }
-                    required
-                    className="w-full rounded border p-3"
-                />
+                    <input
+                        id="name"
+                        name="name"
+                        type="text"
+                        placeholder="Enter name"
+                        className="w-full rounded border p-3"
+                    />
+                </div>
 
-                <select
-                    value={form.role}
-                    onChange={(event) =>
-                        setForm({
-                            ...form,
-                            role: event.target.value as UserRole,
-                        })
-                    }
-                    className="w-full rounded border p-3"
-                >
-                    <option>Admin</option>
-                    <option>Developer</option>
-                    <option>Tester</option>
-                </select>
+                <div>
+                    <label
+                        htmlFor="user-email"
+                        className="mb-1 block text-sm font-medium"
+                    >
+                        Email
+                    </label>
 
-                <select
-                    value={form.status}
-                    onChange={(event) =>
-                        setForm({
-                            ...form,
-                            status:
-                                event.target.value as UserStatus,
-                        })
-                    }
-                    className="w-full rounded border p-3"
-                >
-                    <option>Active</option>
-                    <option>Inactive</option>
-                </select>
+                    <input
+                        id="user-email"
+                        name="email"
+                        type="email"
+                        placeholder="Enter email"
+                        className="w-full rounded border p-3"
+                    />
+                </div>
+
+                <div>
+                    <label
+                        htmlFor="role"
+                        className="mb-1 block text-sm font-medium"
+                    >
+                        Role
+                    </label>
+
+                    <select
+                        id="role"
+                        name="role"
+                        className="w-full rounded border p-3"
+                    >
+                        <option value="Admin">
+                            Admin
+                        </option>
+
+                        <option value="Developer">
+                            Developer
+                        </option>
+
+                        <option value="Tester">
+                            Tester
+                        </option>
+                    </select>
+                </div>
+
+                <div>
+                    <label
+                        htmlFor="status"
+                        className="mb-1 block text-sm font-medium"
+                    >
+                        Status
+                    </label>
+
+                    <select
+                        id="status"
+                        name="status"
+                        className="w-full rounded border p-3"
+                    >
+                        <option value="Active">
+                            Active
+                        </option>
+
+                        <option value="Inactive">
+                            Inactive
+                        </option>
+                    </select>
+                </div>
 
                 <div className="flex gap-3">
                     <button
-                        disabled={loading}
+                        type="submit"
                         className="rounded bg-blue-600 px-5 py-2 text-white"
                     >
-                        {submitButtonText}
+                        Create
                     </button>
 
-                    {selectedUser && (
-                        <button
-                            type="button"
-                            onClick={onCancel}
-                            className="rounded bg-gray-200 px-5 py-2"
-                        >
-                            Cancel
-                        </button>
-                    )}
+                    <button
+                        type="button"
+                        className="rounded bg-gray-200 px-5 py-2"
+                    >
+                        Cancel
+                    </button>
                 </div>
             </div>
         </form>
