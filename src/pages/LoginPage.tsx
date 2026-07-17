@@ -125,11 +125,6 @@ const LoginPage = () => {
               : "Login"}
           </button>
         </form>
-
-        <div className="mt-5 rounded bg-gray-100 p-3 text-sm">
-          <p>admin@example.com</p>
-          <p>admin123</p>
-        </div>
       </div>
     </div>
   );
