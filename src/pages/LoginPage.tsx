@@ -1,4 +1,57 @@
+import { useState } from "react";
+import {
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+import { useAuthStore } from "../store/authsSore";
+
 const LoginPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const login = useAuthStore(
+    (state) => state.login
+  );
+
+  const loading = useAuthStore(
+    (state) => state.loading
+  );
+
+  const error = useAuthStore(
+    (state) => state.error
+  );
+
+  const [email, setEmail] = useState(
+    "admin@example.com"
+  );
+
+  const [password, setPassword] = useState(
+    "admin123"
+  );
+
+  const handleSubmit = async (
+    event: React.SyntheticEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
+
+    const success = await login({
+      email,
+      password,
+    });
+
+    if (!success) {
+      return;
+    }
+
+    const from =
+      location.state?.from?.pathname ??
+      "/dashboard";
+
+    navigate(from, {
+      replace: true,
+    });
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-100">
       <div className="w-full max-w-md rounded-xl bg-white p-8 shadow">
@@ -10,7 +63,16 @@ const LoginPage = () => {
           Login to continue
         </p>
 
-        <form className="space-y-4">
+        {error && (
+          <div className="mb-4 rounded bg-red-100 p-3 text-red-600">
+            {error}
+          </div>
+        )}
+
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4"
+        >
           <div>
             <label
               htmlFor="email"
@@ -21,9 +83,12 @@ const LoginPage = () => {
 
             <input
               id="email"
-              name="email"
               type="email"
-              placeholder="Enter email"
+              value={email}
+              onChange={(event) =>
+                setEmail(event.target.value)
+              }
+              required
               className="w-full rounded border p-3"
             />
           </div>
@@ -38,18 +103,24 @@ const LoginPage = () => {
 
             <input
               id="password"
-              name="password"
               type="password"
-              placeholder="Enter password"
+              value={password}
+              onChange={(event) =>
+                setPassword(event.target.value)
+              }
+              required
               className="w-full rounded border p-3"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full rounded bg-blue-600 p-3 text-white"
+            disabled={loading}
+            className="w-full rounded bg-blue-600 p-3 text-white disabled:opacity-50"
           >
-            Login
+            {loading
+              ? "Logging in..."
+              : "Login"}
           </button>
         </form>
       </div>

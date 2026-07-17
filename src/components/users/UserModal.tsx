@@ -1,16 +1,40 @@
 import { Modal } from "react-bootstrap";
 import UserForm from "./UserForm";
+import { useUserStore } from "../../store/userstore";
+
 
 const UserModal = () => {
+  const isUserModalOpen = useUserStore(
+    (state) => state.isUserModalOpen
+  );
+
+  const selectedUser = useUserStore(
+    (state) => state.selectedUser
+  );
+
+  const submitting = useUserStore(
+    (state) => state.submitting
+  );
+
+  const closeUserModal = useUserStore(
+    (state) => state.closeUserModal
+  );
+
   return (
     <Modal
-      show={false}
+      show={isUserModalOpen}
+      onHide={closeUserModal}
       centered
       backdrop="static"
+      keyboard={!submitting}
     >
-      <Modal.Header closeButton>
+      <Modal.Header
+        closeButton={!submitting}
+      >
         <Modal.Title>
-          Add User
+          {selectedUser
+            ? "Edit User"
+            : "Add User"}
         </Modal.Title>
       </Modal.Header>
 

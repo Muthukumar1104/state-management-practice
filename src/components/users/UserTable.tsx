@@ -1,23 +1,22 @@
-import { Pencil, Trash2 } from "lucide-react";
-
-const users = [
-  {
-    id: 1,
-    name: "Arun Kumar",
-    email: "arun@example.com",
-    role: "Developer",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Priya Sharma",
-    email: "priya@example.com",
-    role: "Tester",
-    status: "Active",
-  },
-];
+import {
+  Pencil,
+  Trash2,
+} from "lucide-react";
+import { useUserStore } from "../../store/userstore";
 
 const UserTable = () => {
+  const users = useUserStore(
+    (state) => state.users
+  );
+
+  const openEditModal = useUserStore(
+    (state) => state.openEditModal
+  );
+
+  const openDeleteModal = useUserStore(
+    (state) => state.openDeleteModal
+  );
+
   return (
     <div className="overflow-x-auto rounded-lg bg-white shadow">
       <table className="w-full">
@@ -59,6 +58,9 @@ const UserTable = () => {
                     type="button"
                     title="Edit user"
                     aria-label="Edit user"
+                    onClick={() =>
+                      openEditModal(user)
+                    }
                     className="rounded p-2 text-blue-600 transition hover:bg-blue-50"
                   >
                     <Pencil size={18} />
@@ -68,6 +70,9 @@ const UserTable = () => {
                     type="button"
                     title="Delete user"
                     aria-label="Delete user"
+                    onClick={() =>
+                      openDeleteModal(user.id)
+                    }
                     className="rounded p-2 text-red-600 transition hover:bg-red-50"
                   >
                     <Trash2 size={18} />
